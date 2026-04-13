@@ -1,0 +1,53 @@
+name: gha-package-and-upload-artifact
+
+description: |-
+  GitHub Action used as a workaround for GHES multi-file artifact slowdown - Packages
+  files into a single archive before uploading via actions/upload-artifact.
+
+author: albr21
+branding:
+  icon: archive
+  color: white
+
+inputs:
+  path:
+    description: Path of the folder to package and upload as an artifact on GitHub
+    required: true
+  artifact-name:
+    description: Name of the artifact to upload on GitHub
+    required: true
+  package-name:
+    description: Name of the package to create, by default, it's set to artifact-name
+    required: false
+    default: ""
+  command-line-interpreter:
+    description: |-
+      Command line interpreter.
+      By default, it uses `bash`, but you can change it to `sh`.
+    required: false
+    default: bash
+
+outputs:
+  artifact-id:
+    description: The id of the uploaded artifact on GitHub
+    value: ${{ inputs.artifact-name }}
+  package-name:
+    description: The name of the created package
+    value: ${{ inputs.package-name || inputs.artifact-name }}
+
+runs:
+  using: composite
+  steps:
+    - name: Package Artifact
+      id: package-artifact
+      run: |-
+        tar -czf ${{ inputs.package-name || inputs.artifact-name }}.tar.gz -C ${{ inputs.path }} .
+      shell: ${{ inputs.command-line-interpreter }}
+
+    - name: Upload Artifact
+      id: upload-artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.package-name || inputs.artifact-name }}.tar.gz
+        if-no-files-found: error
