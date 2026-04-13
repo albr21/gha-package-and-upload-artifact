@@ -1,7 +1,10 @@
-name: <project-name>
+name: gha-package-and-upload-artifact
 description: |-
-  <project-description>
-version: 0.0.0
+  GitHub Action used as a workaround for GHES multi-file artifact slowdown - Packages
+  files into a single archive before uploading via actions/upload-artifact.
+version: 1.0.0
 changes: |-
+  [1.0.0]
+    * Initial release
   [0.0.0]
     * Under development
